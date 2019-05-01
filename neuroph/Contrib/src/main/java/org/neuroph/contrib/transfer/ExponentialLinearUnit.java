@@ -11,6 +11,10 @@ public class ExponentialLinearUnit extends TransferFunction {
 
     double alpha = 1d; 
     
+    public ExponentialLinearUnit() {
+    
+    }
+    
     public ExponentialLinearUnit(double alpha) {
         this.alpha = alpha;
     }
