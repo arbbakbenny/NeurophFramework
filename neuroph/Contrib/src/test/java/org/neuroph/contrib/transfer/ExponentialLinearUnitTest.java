@@ -21,8 +21,8 @@ public class ExponentialLinearUnitTest {
         testValue = -1d;
         double expectedValue = eluAlpha * (Math.exp(testValue) - 1) + eluAlpha;
         Assert.assertEquals(
-                "ELU should have constant derivative equal to 1 for "
-                        + "positive values", 
+                "ELU should have derivative equal to it's output value + alpha "
+                        + "when input is less or equal to 0", 
                 expectedValue,
                 elu.getDerivative(testValue),
                 0.01
