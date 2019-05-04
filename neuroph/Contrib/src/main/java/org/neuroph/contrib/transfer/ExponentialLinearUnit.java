@@ -21,10 +21,10 @@ public class ExponentialLinearUnit extends TransferFunction {
     
     @Override
     public double getOutput(double net) {
-        if (net < 0d) {
-            return alpha * (Math.exp(net) - 1);
+        if (net > 0d) {
+            return net;
         }
-        return net;
+        return alpha * (Math.exp(net) - 1);
     }
 
     @Override
