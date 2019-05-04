@@ -1,6 +1,7 @@
 
 package org.neuroph.contrib.transfer;
 
+import java.io.Serializable;
 import org.neuroph.util.Properties;
 import org.neuroph.core.transfer.TransferFunction;
 
@@ -8,7 +9,7 @@ import org.neuroph.core.transfer.TransferFunction;
  * 
  * @see https://arxiv.org/pdf/1511.07289.pdf
  */
-public class ExponentialLinearUnit extends TransferFunction {
+public class ExponentialLinearUnit extends TransferFunction implements Serializable {
 
     double alpha = 1d; 
     
@@ -29,7 +30,8 @@ public class ExponentialLinearUnit extends TransferFunction {
         if (net > 0d) {
             return net;
         }
-        return alpha * (Math.exp(net) - 1);
+        this.output = alpha * (Math.exp(net) - 1);
+        return this.output;
     }
 
     @Override
@@ -37,6 +39,6 @@ public class ExponentialLinearUnit extends TransferFunction {
         if (net > 0d) {
             return 1d;
         }
-        return alpha * Math.exp(net);
+        return this.output + alpha;
     }
 }

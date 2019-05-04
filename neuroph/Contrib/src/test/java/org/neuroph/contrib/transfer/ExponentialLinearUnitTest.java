@@ -10,6 +10,7 @@ public class ExponentialLinearUnitTest {
         double eluAlpha = 2;
         ExponentialLinearUnit elu = new ExponentialLinearUnit(eluAlpha);
         double testValue = 20d;
+        elu.getOutput(testValue);
         Assert.assertEquals(
                 "ELU should have constant derivative equal to 1 for "
                         + "positive values", 
@@ -18,8 +19,10 @@ public class ExponentialLinearUnitTest {
                 0.01
         );
         
+        elu = new ExponentialLinearUnit(eluAlpha);
         testValue = -1d;
-        double expectedValue = eluAlpha * (Math.exp(testValue) - 1) + eluAlpha;
+        elu.getOutput(testValue);
+        double expectedValue = eluAlpha * Math.exp(testValue);
         Assert.assertEquals(
                 "ELU should have derivative equal to it's output value + alpha "
                         + "when input is less or equal to 0", 
@@ -35,6 +38,7 @@ public class ExponentialLinearUnitTest {
         double testValue = 20d;
         Assert.assertEquals(testValue, elu.getOutput(testValue), 0.01);
         
+        elu = new ExponentialLinearUnit();
         testValue = -1d;
         Assert.assertEquals(-0.6321, elu.getOutput(testValue), 0.01);
         
