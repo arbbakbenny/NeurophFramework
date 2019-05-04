@@ -1,6 +1,7 @@
 
 package org.neuroph.contrib.transfer;
 
+import org.neuroph.util.Properties;
 import org.neuroph.core.transfer.TransferFunction;
 
 /**
@@ -19,6 +20,10 @@ public class ExponentialLinearUnit extends TransferFunction {
         this.alpha = alpha;
     }
     
+    public ExponentialLinearUnit(Properties properties) {
+        this.alpha = (double) properties.getProperty("transferFunctionAlpha");
+    }
+    
     @Override
     public double getOutput(double net) {
         if (net > 0d) {
@@ -32,6 +37,6 @@ public class ExponentialLinearUnit extends TransferFunction {
         if (net > 0d) {
             return 1d;
         }
-        return getOutput(net) + alpha;
+        return alpha * Math.exp(net);
     }
 }
