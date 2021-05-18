@@ -78,7 +78,7 @@ import org.neuroph.util.data.norm.Normalizer;
 
 
  */
-public class Abalone implements LearningEventListener {
+public class Abalone {
 
     public static void main(String[] args) {
         (new Abalone()).run();
@@ -105,7 +105,10 @@ public class Abalone implements LearningEventListener {
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
-        learningRule.addListener(this);
+        learningRule.addListener((event) -> {
+            MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
+            System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());        
+        });
 
         // set learning rate and max error
         learningRule.setLearningRate(0.1);
@@ -115,67 +118,16 @@ public class Abalone implements LearningEventListener {
         // train the network with training set
         neuralNet.learn(trainingSet);
         System.out.println("Training completed.");
-        System.out.println("Testing network...");
-
-        System.out.println("Network performance on the test set");
-        evaluate(neuralNet, testSet);
 
         System.out.println("Saving network");
         // save neural network to file
         neuralNet.save("nn1.nnet");
 
         System.out.println("Done.");
-
-        System.out.println();
-        System.out.println("Network outputs for test set");
-        testNeuralNetwork(neuralNet, testSet);
     }
 
-    // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
-    public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
 
-        System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
 
-        for (DataSetRow testSetRow : testSet.getRows()) {
-            neuralNet.setInput(testSetRow.getInput());
-            neuralNet.calculate();
-            double[] networkOutput = neuralNet.getOutput();
 
-            System.out.println("Input: " + Arrays.toString(testSetRow.getInput()));
-            System.out.println("Output: " + Arrays.toString(networkOutput));
-            System.out.println("Desired output" + Arrays.toString(testSetRow.getDesiredOutput()));
-        }
-    }
 
-    // Evaluates performance of neural network.
-    // Contains calculation of Confusion matrix for classification tasks or Mean Ssquared Error and Mean Absolute Error for regression tasks.
-    // Difference in binary and multi class classification are made when adding Evaluator (MultiClass or Binary).
-    public void evaluate(NeuralNetwork neuralNet, DataSet dataSet) {
-
-        System.out.println("Calculating performance indicators for neural network.");
-        Evaluation evaluation = new Evaluation();
-        evaluation.addEvaluator(new ErrorEvaluator(new MeanSquaredError()));
-
-        String classLabels[] = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29"};
-        evaluation.addEvaluator(new ClassifierEvaluator.MultiClass(classLabels));
-        evaluation.evaluate(neuralNet, dataSet);
-
-        ClassifierEvaluator evaluator = evaluation.getEvaluator(ClassifierEvaluator.MultiClass.class);
-        ConfusionMatrix confusionMatrix = evaluator.getResult();
-        System.out.println("Confusion matrrix:\r\n");
-        System.out.println(confusionMatrix.toString() + "\r\n\r\n");
-        System.out.println("Classification metrics\r\n");
-        ClassificationMetrics[] metrics = ClassificationMetrics.createFromMatrix(confusionMatrix);
-        ClassificationMetrics.Stats average = ClassificationMetrics.average(metrics);
-        for (ClassificationMetrics cm : metrics) {
-            System.out.println(cm.toString() + "\r\n");
-        }
-        System.out.println(average.toString());
-    }
-
-    @Override
-    public void handleLearningEvent(LearningEvent event) {
-        MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
-        System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
-    }
 }

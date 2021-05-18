@@ -16,7 +16,6 @@
 package org.neuroph.samples.standard10ml;
 
 import java.util.Arrays;
-import java.util.List;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
@@ -30,15 +29,14 @@ import org.neuroph.eval.classification.ClassificationMetrics;
 import org.neuroph.eval.classification.ConfusionMatrix;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
-import org.neuroph.util.TransferFunctionType;
 import org.neuroph.util.data.norm.MaxNormalizer;
 import org.neuroph.util.data.norm.Normalizer;
 
 /**
- *
- * @author Nevena Milenkovic
- */
-/*
+  Binary classification of radar signals.
+
+  @author Nevena Milenkovic
+
  INTRODUCTION TO THE PROBLEM AND DATA SET INFORMATION:
 
  1. Data set that will be used in this experiment: Ionosphere Dataset
@@ -51,7 +49,7 @@ import org.neuroph.util.data.norm.Normalizer;
 
 3. Number of instances: 351
 
-4. Number of Attributes: 34 pluss class attributes
+4. Number of Attributes: 34 plus class attributes
 
 5. Attribute Information:
    Inputs:
@@ -61,11 +59,8 @@ import org.neuroph.util.data.norm.Normalizer;
 
 6. Missing Values: None.
 
-
-
-
  */
-public class Ionosphere implements LearningEventListener {
+public class Ionosphere {
 
     public static void main(String[] args) {
         (new Ionosphere()).run();
@@ -95,7 +90,10 @@ public class Ionosphere implements LearningEventListener {
 
         neuralNet.setLearningRule(new MomentumBackpropagation());
         MomentumBackpropagation learningRule = (MomentumBackpropagation) neuralNet.getLearningRule();
-        learningRule.addListener(this);
+        learningRule.addListener((event) -> {
+            MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
+            System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
+        });
 
         // set learning rate and max error
         learningRule.setLearningRate(0.1);
@@ -114,26 +112,6 @@ public class Ionosphere implements LearningEventListener {
         neuralNet.save("nn1.nnet");
 
         System.out.println("Done.");
-
-        System.out.println();
-        System.out.println("Network outputs for test set");
-        testNeuralNetwork(neuralNet, testSet);
-    }
-
-    // Displays inputs, desired output (from dataset) and actual output (calculated by neural network) for every row from data set.
-    public void testNeuralNetwork(NeuralNetwork neuralNet, DataSet testSet) {
-
-        System.out.println("Showing inputs, desired output and neural network output for every row in test set.");
-
-        for (DataSetRow testSetRow : testSet.getRows()) {
-            neuralNet.setInput(testSetRow.getInput());
-            neuralNet.calculate();
-            double[] networkOutput = neuralNet.getOutput();
-
-            System.out.println("Input: " + Arrays.toString(testSetRow.getInput()));
-            System.out.println("Output: " + Arrays.toString(networkOutput));
-            System.out.println("Desired output" + Arrays.toString(testSetRow.getDesiredOutput()));
-        }
     }
 
     // Evaluates performance of neural network.
@@ -162,9 +140,4 @@ public class Ionosphere implements LearningEventListener {
         System.out.println(average.toString());
     }
 
-    @Override
-    public void handleLearningEvent(LearningEvent event) {
-        MomentumBackpropagation bp = (MomentumBackpropagation) event.getSource();
-        System.out.println(bp.getCurrentIteration() + ". iteration | Total network error: " + bp.getTotalNetworkError());
-    }
 }

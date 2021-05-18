@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.neuroph.imgrec.filter.impl;
 
 import java.awt.Color;
@@ -21,23 +15,20 @@ import org.neuroph.imgrec.filter.ImageFilter;
  * 
  * @author Mihailo Stupar
  */
-public class HistogramEqualizationFilter implements ImageFilter,Serializable {
+public class HistogramEqualizationFilter implements ImageFilter<BufferedImage>,Serializable {
 
     private transient BufferedImage originalImage;
     private transient BufferedImage filteredImage;
 	
     @Override
-    public BufferedImage processImage(BufferedImage image) {
+    public BufferedImage apply(BufferedImage image) {
 		
-	originalImage = image;
-		
+	originalImage = image;		
 	int width = originalImage.getWidth();
-	int height = originalImage.getHeight();
-		
+	int height = originalImage.getHeight();		
 	filteredImage = new BufferedImage(width, height, originalImage.getType());
 		
-	int [] histogram = imageHistogram(originalImage);
-		
+	int [] histogram = imageHistogram(originalImage);		
 	int [] histogramCumulative = new int[histogram.length];
 		
 	histogramCumulative[0] = histogram[0];
@@ -52,15 +43,11 @@ public class HistogramEqualizationFilter implements ImageFilter,Serializable {
 	int newColor;
 		
 	for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-				
+            for (int j = 0; j < height; j++) {				
 		gray = new Color(originalImage.getRGB(i, j)).getRed();
-		alpha = new Color(originalImage.getRGB(i, j)).getAlpha();
-				
-		newColor = (G-1)*histogramCumulative[gray]/(width*height); //zaokruziti izbeci celobrojno deljenje
-
-				
-		newColor = ImageUtilities.colorToRGB(alpha, newColor, newColor, newColor);
+		alpha = new Color(originalImage.getRGB(i, j)).getAlpha();				
+		newColor = (G-1)*histogramCumulative[gray]/(width*height); //zaokruziti izbeci celobrojno deljenje			
+		newColor = ImageUtilities.argbToColor(alpha, newColor, newColor, newColor);
 		filteredImage.setRGB(i, j, newColor);
             }
 	}
@@ -68,11 +55,9 @@ public class HistogramEqualizationFilter implements ImageFilter,Serializable {
 	return filteredImage;
     }
 	
-	
-    public int[] imageHistogram(BufferedImage image) {
-
-	int[] histogram = new int[256];
-
+    // ubaci u neku util klasu jer je isto kao i kod OtsuBinarizera
+    private int[] imageHistogram(BufferedImage image) {
+	int[] histogram = new int[256]; // histogram je 256 jer tretira samo nijanse sive
 	for (int i = 0; i < histogram.length; i++)
             histogram[i] = 0;
 
